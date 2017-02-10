@@ -1,0 +1,11 @@
+### IntelliJ IDEA ###
+.idea
+*.iml
+*.log
+
+tmp.txt
+tmp.*
+*.tar.gz
+
+### Project Placeholder ###
+Download/*
