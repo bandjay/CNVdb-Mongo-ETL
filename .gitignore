@@ -6,6 +6,7 @@
 tmp.txt
 tmp.*
 *.tar.gz
+*.txt.gz
 
 ### Project Placeholder ###
 Download/*

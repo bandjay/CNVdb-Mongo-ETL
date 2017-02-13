@@ -1,12 +1,14 @@
 __author__ = 'm088378'
 
-import sys, os, csv
-import pymongo
+import sys
+import os
+import csv
+import argparse
+import ConfigParser
+
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 from bson.json_util import dumps
 from bson.json_util import loads
-import argparse, ConfigParser
 
 dirname, filename = os.path.split(os.path.dirname(os.path.realpath(__file__)))
 conf_file = os.path.join(dirname,'config.cfg')
@@ -41,11 +43,10 @@ parser.set_defaults(feature=False)
 args = parser.parse_args()
 
 
-
-
+### ADD LOGGING TO THIS SCRIPT ###
 import logging
-logger = logging.getLogger('myapp')
-hdlr = logging.FileHandler('dgv_load.log')
+logger = logging.getLogger('LoadDGV')
+hdlr = logging.FileHandler(config.get('logger', 'logfile'))
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
@@ -56,13 +57,9 @@ logger.setLevel(logging.WARNING)
 
 ####### Setup database connection #######
 client = MongoClient('localhost', 27017)
-#client = MongoClient('40.77.16.253', 27017)
 db = client["cnvDB-research"]
-if args.clin:
-	db = client["cnvDB-clinical"]
-
-cnvSmp = db["meta"]
-cnvClc = db["cnv"]
+cnvSmp = db["meta-hg19"]
+cnvClc = db["cnv-hg19"]
 
 
 ############### FUNCTIONS #################
