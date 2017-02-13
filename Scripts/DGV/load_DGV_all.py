@@ -58,8 +58,8 @@ logger.setLevel(logging.WARNING)
 ####### Setup database connection #######
 client = MongoClient('localhost', 27017)
 db = client["cnvDB-research"]
-cnvSmp = db["meta-hg19"]
-cnvClc = db["cnv-hg19"]
+cnvSmp = db["meta_HG19"]
+cnvClc = db["cnv_HG19"]
 
 
 ############### FUNCTIONS #################
