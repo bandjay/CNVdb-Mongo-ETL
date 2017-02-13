@@ -31,14 +31,23 @@ Add Gene Refflat to Mongo
 ### How to get the raw data from DGV Manually
 Navigate to: http://dgv.tcag.ca/dgv/app/downloads?ref=GRCh37/hg19
 Download: Supporting Variants - 2016-05-15
+or
+
+    wget http://dgv.tcag.ca/dgv/docs/GRCh37_hg19_variants_2016-05-15.txt
+    
 ### How to get the sample level data from DGV Manually
 Navigate to: http://dgv.tcag.ca/dgv/app/search?ref=GRCh37/hg19#tabs-view_all_info_sample
 Inspect in browser, edit table show element to display all.
 Then download via CSV
 
     Commandline example:
-    python load_DGV_all.py -f GRCh37_hg19_supportingvariants_2016-05-15.txt -m SampleList.csv
+    python Scripts/DGV/load_DGV_all.py -f Download/GRCh37_hg19_variants_2016-05-15.txt -m Download/Database\ of\ Genomic\ Variants.csv
 
+
+## TCGA
+
+    Commandline example:
+    python Python/Load/load_TCGA_all.py -g ../Data/TCGA/TCGA.hg19.June2011.gaf -s ../Data/TCGA/Job-30305677257777413408743051.csv -n /data2/bsi/staff_analysis/m092469/data/CNVdatabase/TCGA_PAN12_data/PANCAN12.Genome_Wide_SNP_6.cna.normal_whitelist -t /data2/bsi/staff_analysis/m092469/data/CNVdatabase/TCGA_PAN12_data/PANCAN12.Genome_Wide_SNP_6.cna.tumor_whitelist
 
 
 

@@ -53,7 +53,7 @@ logger.addHandler(hdlr)
 logger.setLevel(logging.WARNING)
 
 
-
+# TODO: make database configureable
 
 ####### Setup database connection #######
 client = MongoClient('localhost', 27017)
