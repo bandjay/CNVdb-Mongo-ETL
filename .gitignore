@@ -5,6 +5,7 @@
 
 tmp.txt
 tmp.*
+tmp
 *.tar.gz
 *.txt.gz
 

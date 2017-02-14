@@ -109,75 +109,82 @@ print "Start Loading Samples..."
 sampleMap = {}
 aggregateDGVSamplelines = {}
 metaCSVFile = csv.reader(open(args.meta), quotechar="'")
-for row in metaCSVFile:
-	if row[1] == "null":
-		print row
-		sys.exit(1)
-		
-	if row[1] in aggregateDGVSamplelines:
-		aggregateDGVSamplelines[row[1]].append(row)
-	else:
-		aggregateDGVSamplelines[row[1]] = [row]
-
-i=1 
-for key in aggregateDGVSamplelines:
-	my_Samp = dict()
-	my_Samp['sample_name'] = key
-	my_Samp['data_source'] = "DGV"
-	my_Samp['bio_sample_type'] = "normal"
-	my_Samp['entity_type'] = "single"
-	my_Samp['bio_mutation_type'] = "germline"
-	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 0)
-	if checkToSave(tmp):
-		my_Samp['studies'] = tmp
-	
-	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 1)
-	if checkToSave(tmp):
-		my_Samp['external_ids'] = tmp
-	
-	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 2)
-	if checkToSave(tmp):
-		my_Samp['bio_family_id'] = tmp
-	
-	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 3)
-	if checkToSave(tmp):
-		my_Samp['bio_source'] = tmp
-	
-	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 4)
-	if checkToSave(tmp):
-		my_Samp['bio_description'] = tmp
-	
-	tmp = collapseAttributesToJoin(aggregateDGVSamplelines, key, 5)
-	if checkToSave(tmp):
-		my_Samp['bio_ethnicity'] = tmp
-	
-	tmp = collapseAttributesToJoin(aggregateDGVSamplelines, key, 6)
-	if checkToSave(tmp):
-		my_Samp['bio_gender'] = tmp.lower()
-	
-	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 7)
-	if checkToSave(tmp):
-		my_Samp['bio_sample_cohort'] = tmp
-	
-	_id = cnvSmp.insert(loads(dumps(my_Samp)))
-	sampleMap[key] = _id
-	
-	## Display Ticker
-	if i%5000==1:
-		print ""
-	if i%100==1:
-		sys.stdout.write('. ')
-		sys.stdout.flush()
-	
-	i+=1
+# for row in metaCSVFile:
+# 	if row[1] == "null":
+# 		print row
+# 		sys.exit(1)
+#
+# 	if row[1] in aggregateDGVSamplelines:
+# 		aggregateDGVSamplelines[row[1]].append(row)
+# 	else:
+# 		aggregateDGVSamplelines[row[1]] = [row]
+#
+# i=1
+# for key in aggregateDGVSamplelines:
+# 	my_Samp = dict()
+# 	my_Samp['sample_name'] = key
+# 	my_Samp['data_source'] = "DGV"
+# 	my_Samp['bio_sample_type'] = "normal"
+# 	my_Samp['entity_type'] = "single"
+# 	my_Samp['bio_mutation_type'] = "germline"
+# 	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 0)
+# 	if checkToSave(tmp):
+# 		my_Samp['studies'] = tmp
+#
+# 	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 1)
+# 	if checkToSave(tmp):
+# 		my_Samp['external_ids'] = tmp
+#
+# 	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 2)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_family_id'] = tmp
+#
+# 	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 3)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_source'] = tmp
+#
+# 	tmp = collapseAttributesToSingle(aggregateDGVSamplelines, key, 4)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_description'] = tmp
+#
+# 	tmp = collapseAttributesToJoin(aggregateDGVSamplelines, key, 5)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_ethnicity'] = tmp
+#
+# 	tmp = collapseAttributesToJoin(aggregateDGVSamplelines, key, 6)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_gender'] = tmp.lower()
+#
+# 	tmp = collapseAttributesToList(aggregateDGVSamplelines, key, 7)
+# 	if checkToSave(tmp):
+# 		my_Samp['bio_sample_cohort'] = tmp
+#
+# 	_id = cnvSmp.insert(loads(dumps(my_Samp)))
+# 	sampleMap[key] = _id
+#
+# 	## Display Ticker
+# 	if i%5000==1:
+# 		print ""
+# 	if i%100==1:
+# 		sys.stdout.write('. ')
+# 		sys.stdout.flush()
+#
+# 	i+=1
 
 print "\nLoaded "+str(len(aggregateDGVSamplelines))+" Samples Meta Data\n\n"
 
 
 
 ############### LOAD CNV DATA ########################
+## ['variantaccession', 'chr', 'start', 'end', 'varianttype', 'variantsubtype', 'reference', 'pubmedid',
+##  'method', 'platform', 'mergedvariants', 'supportingvariants', 'mergedorsample', 'frequency', 'samplesize',
+##  'observedgains', 'observedlosses', 'cohortdescription', 'genes', 'samples']
+
 sCSVFile = csv.reader(open(args.input), delimiter='\t')
 sCSVHeaders = sCSVFile.next()
+print(sCSVHeaders)
+print(sCSVHeaders.index('variantaccession'))
+
 n=1
 for row in sCSVFile:
 	# Missing Sample Information

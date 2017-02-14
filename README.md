@@ -33,7 +33,7 @@ Navigate to: http://dgv.tcag.ca/dgv/app/downloads?ref=GRCh37/hg19
 Download: Supporting Variants - 2016-05-15
 or
 
-    wget http://dgv.tcag.ca/dgv/docs/GRCh37_hg19_variants_2016-05-15.txt
+    wget http://dgv.tcag.ca/dgv/docs/GRCh37_hg19_supportingvariants_2016-05-15.txt
     
 ### How to get the sample level data from DGV Manually
 Navigate to: http://dgv.tcag.ca/dgv/app/search?ref=GRCh37/hg19#tabs-view_all_info_sample
