@@ -10,6 +10,8 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.json_util import loads
 
+from Utils.formatter import *
+
 dirname, filename = os.path.split(os.path.dirname(os.path.realpath(__file__)))
 conf_file = os.path.join(dirname,'config.cfg')
 if not os.path.exists(conf_file):
@@ -18,8 +20,6 @@ if not os.path.exists(conf_file):
 
 config = ConfigParser.ConfigParser()
 config.read(conf_file)
-#print config.get('mongodb-conf', 'url')
-
 
 def is_valid_file(parser, arg):
     arg = os.path.abspath(arg)
@@ -61,48 +61,6 @@ db = client["cnvDB-research"]
 cnvSmp = db["meta_HG19"]
 cnvClc = db["cnv_HG19"]
 
-
-############### FUNCTIONS #################
-def collapseAttributesToList( myDict, k, idx):
-	clist = list(set([x[idx] for x in myDict[k]]))
-	if 'null' in clist:
-		clist.remove('null')
-	return clist
-
-def collapseAttributesToSingle( myDict, k, idx):
-	clist = list(set([x[idx] for x in myDict[k]]))
-	if 'null' in clist:
-		clist.remove('null')
-	if len(clist) > 1:
-		print "ERROR: TOO MANY VALUES"
-		print "Index = "+str(idx)
-		print myDict[k]
-		sys.exit(1)
-	if len(clist) < 1:
-		return ''
-	else:
-		return clist[0]
-		
-def collapseAttributesToJoin( myDict, k, idx):
-	clist = list(set([x[idx] for x in myDict[k]]))
-	if 'null' in clist:
-		clist.remove('null')
-	if len(clist) < 1:
-		return ''
-	else:
-		return ';'.join(clist)
-
-def checkToSave(x):
-	if type(x) is list:
-		if len(x) > 0:
-			return True
-		else:
-			return False
-	elif type(x) is str:
-		if x == '':
-			return False
-		else:
-			return True
 
 ####### Detect and Load This Meta Data ######
 print "Start Loading Samples..."

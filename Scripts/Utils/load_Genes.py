@@ -1,16 +1,26 @@
 __author__ = 'm088378'
 
-import sys, gzip
+import sys, os, gzip, ConfigParser
 from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.json_util import loads
 
-# TODO: Add checking for existing file - allow to pass as Parameter.
+dirname, filename = os.path.split(os.path.dirname(os.path.realpath(__file__)))
+conf_file = os.path.join(dirname,'config.cfg')
+if not os.path.exists(conf_file):
+    print("ERROR: Missing Config File")
+    sys.exit(1)
 
+config = ConfigParser.ConfigParser()
+config.read(conf_file)
+dbURL = config.get('mongodb-conf', 'url')
+dbPort = int(config.get('mongodb-conf', 'port'))
+dbName = config.get('mongodb-conf', 'database_name')
+dbGeneCollection = "{}_{}".format(config.get('mongodb-conf', 'gene_collection_prefix'), "HG19")
+
+# TODO: Add checking for existing file - allow to pass as Parameter.
 #urlFile="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refFlat.txt.gz"
 #urllib.urlretrieve(urlFile, "refFlat.txt.gz")
-
-# TODO: add config to connect Mongo
 
 
 # string  geneName;           "Name of gene as it appears in Genome Browser."
@@ -25,10 +35,12 @@ from bson.json_util import loads
 # uint[exonCount] exonStarts; "Exon start positions"
 # uint[exonCount] exonEnds;   "Exon end positions"
 
+# TODO: add config to connect Mongo
+
 ####### Setup database connection #######
-client = MongoClient('localhost', 27017)
-db = client["cnvDB-research"]
-gnCollection = db["gene_HG19"]
+client = MongoClient(dbURL, dbPort)
+db = client[dbName]
+gnCollection = db[dbGeneCollection]
 
 
 i=1
@@ -55,8 +67,8 @@ with gzip.open('refFlat.txt.gz','r') as fin:
         #print(acc)
         gnCollection.insert(loads(dumps(acc)))
 
-        #if i > 10:
-        #    sys.exit()
+        if i > 10:
+            sys.exit()
 
 print("Loaded "+str(i)+" Genes From Refflat")
 
