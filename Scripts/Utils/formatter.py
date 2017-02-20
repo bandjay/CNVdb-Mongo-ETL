@@ -1,7 +1,16 @@
 __author__ = 'm088378'
-import sys
+import sys, os
 
-############### FUNCTIONS #################
+######### ARG FUNCTIONS ############
+def is_valid_file(parser, arg):
+    arg = os.path.abspath(arg)
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
+
+############### My FUNCTIONS #################
 
 ### Accept a dictonary, key & index, collapse to a list
 def collapseAttributesToList( myDict, k, idx):
@@ -45,3 +54,19 @@ def checkToSave(x):
             return False
         else:
             return True
+
+
+def strToLog2Ratio(s):
+    lgr = 0
+    if s.lower() == "deletion":
+        lgr = -2
+    elif s.lower() == "loss":
+        lgr = -1
+    elif s.lower() == "gain":
+        lgr = 1
+    elif s.lower() == "duplication":
+        lgr = 2
+    return lgr
+
+
+

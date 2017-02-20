@@ -1,50 +1,42 @@
 __author__ = 'm088378'
 
-import sys
-import os
-import csv
-import argparse
-import ConfigParser
-
+import sys, os, csv
+import argparse, ConfigParser
 from pymongo import MongoClient
 from bson.json_util import dumps
 from bson.json_util import loads
-
 from Utils.formatter import *
+import logging
 
-dirname, filename = os.path.split(os.path.dirname(os.path.realpath(__file__)))
-conf_file = os.path.join(dirname,'config.cfg')
+# Relative Find of Config File #
+dirname = os.path.dirname(os.path.realpath(__file__))
+#dirname, filename = os.path.split(os.path.dirname(os.path.realpath(__file__)))
+conf_file = os.path.join(dirname, 'config.cfg')
 if not os.path.exists(conf_file):
     print("ERROR: Missing Config File")
     sys.exit(1)
-
 config = ConfigParser.ConfigParser()
 config.read(conf_file)
 
-def is_valid_file(parser, arg):
-    arg = os.path.abspath(arg)
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return arg
 
-parser = argparse.ArgumentParser(description='Load CNV Data downloaded from DGV [public source of normal samples] to Mayo centeralized database.')
+# Create CLI Args #
+parser = argparse.ArgumentParser(
+    description='Load CNV Data downloaded from DGV [public source of normal samples] to Mayo centeralized database.')
 parser.add_argument("-f", "--file",
                     dest="input",
                     type=lambda x: is_valid_file(parser, x),
                     help="Text file download from DGV",
-                    metavar="FILE",required=True)
+                    metavar="FILE", required=True)
 parser.add_argument("-m", "--meta",
                     dest="meta",
                     type=lambda x: is_valid_file(parser, x),
                     help="Meta File (webscraped from DGV)",
-                    metavar="FILE",required=True)
+                    metavar="FILE", required=True)
 parser.set_defaults(feature=False)
 args = parser.parse_args()
 
 
-### ADD LOGGING TO THIS SCRIPT ###
-import logging
+# ADD LOGGING TO THIS SCRIPT #
 logger = logging.getLogger('LoadDGV')
 hdlr = logging.FileHandler(config.get('logger', 'logfile'))
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
@@ -129,7 +121,7 @@ metaCSVFile = csv.reader(open(args.meta), quotechar="'")
 #
 # 	i+=1
 
-print "\nLoaded "+str(len(aggregateDGVSamplelines))+" Samples Meta Data\n\n"
+print "\nLoaded " + str(len(aggregateDGVSamplelines)) + " Samples Meta Data\n\n"
 
 
 
@@ -140,48 +132,47 @@ print "\nLoaded "+str(len(aggregateDGVSamplelines))+" Samples Meta Data\n\n"
 
 sCSVFile = csv.reader(open(args.input), delimiter='\t')
 sCSVHeaders = sCSVFile.next()
-print(sCSVHeaders)
-print(sCSVHeaders.index('variantaccession'))
+#print(sCSVHeaders)
+#print(sCSVHeaders.index('variantaccession'))
 
-n=1
+n = 1
 for row in sCSVFile:
-	# Missing Sample Information
-	if row[19] == "":
-		continue
+    # Missing Sample Information
+    if row[sCSVHeaders.index('samples')] == "":
+        logger.debug("SKIP: [samples] n="+n+", variantaccession="+row[sCSVHeaders.index('variantaccession')])
+        continue
 
-	# Skip 'merge' CNV entries
-	if row[12] == "M":
-		continue
+    # Skip 'merge' CNV entries
+    if row[sCSVHeaders.index('mergedorsample')] == "M":
+        logger.debug("SKIP: [mergedorsample] n="+n+", variantaccession="+row[sCSVHeaders.index('variantaccession')])
+        continue
 
-	lgr = 0
-	if row[5].lower() == "deletion":
-		lgr = -2
-	elif row[5].lower() == "loss":
-		lgr = -1
-	elif row[5].lower() == "gain":
-		lgr = 1
-	elif row[5].lower() == "duplication":
-		lgr = 2
-	
-	acc = {'accession':row[0], 'reported':row[5], 'pubmed':row[7]}
-	vals = {'data_type': row[4]+".call", 'log2ratio':lgr, 'chr':row[1], 'start':int(row[2]), 'end':int(row[3]), 'features':acc, 'data_source': "DGV", 'entity_type':"single", 'bio_mutation_type':"germline"}
-	
-	samps = [x.strip() for x in row[19].split(',')]
-	for s in samps:
-		if s in sampleMap:
-			my_Var = vals
-			my_Var["sample"] = sampleMap[s]
-			my_Var["sample_name"] = s
-			cnvClc.insert(loads(dumps(my_Var)))
-		else:
-			logger.error("No Sample Meta: ("+s+")")
+    lgr = strToLog2Ratio(row[sCSVHeaders.index('variantsubtype')])
 
-	## Display Ticker
-	if n%5000==1:
-		print ""
-	if n%100==1:
-		sys.stdout.write('. ')
-		sys.stdout.flush()
-	n+=1
 
-print "\nLoaded "+str(n)+" CNV Records Data\n\n"
+    #TODO make features, from setdiff of header.
+
+    acc = {'accession': row[0], 'reported': row[5], 'pubmed': row[7]}
+
+    vals = {'data_type': row[4] + ".call", 'log2ratio': lgr, 'chr': row[1], 'start': int(row[2]), 'end': int(row[3]),
+            'features': acc, 'data_source': "DGV", 'entity_type': "single", 'bio_mutation_type': "germline"}
+
+    samps = [x.strip() for x in row[sCSVHeaders.index('samples')].split(',')]
+    for s in samps:
+        if s in sampleMap:
+            my_Var = vals
+            my_Var["sample"] = sampleMap[s]
+            my_Var["sample_name"] = s
+            cnvClc.insert(loads(dumps(my_Var)))
+        else:
+            logger.error("No Sample Meta: (" + s + ")")
+
+    # Display Ticker
+    if n % 5000 == 1:
+        print ""
+    if n % 100 == 1:
+        sys.stdout.write('. ')
+        sys.stdout.flush()
+    n += 1
+
+print "\nLoaded " + str(n) + " CNV Records Data\n\n"

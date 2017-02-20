@@ -41,7 +41,7 @@ Inspect in browser, edit table show element to display all.
 Then download via CSV
 
     Commandline example:
-    python Scripts/DGV/load_DGV_all.py -f Download/GRCh37_hg19_variants_2016-05-15.txt -m Download/Database\ of\ Genomic\ Variants.csv
+    python Scripts/load_DGV_nonMergedVars.py -f Download/GRCh37_hg19_variants_2016-05-15.txt -m Download/Database\ of\ Genomic\ Variants.csv
 
 
 ## TCGA
