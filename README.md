@@ -20,6 +20,9 @@ Configure your Python enviroment:
     pip install --upgrade -r Scripts/requirements.txt 
 	python Scripts/DGV/load_DGV_all.py -h
 
+Added a development user to database
+db.createUser( { user: "devUser", pwd: "etldev", roles: [ "readWrite", "dbAdmin" ] } )
+
 ## Install Support Collections
 
 Add Gene Refflat to Mongo
@@ -44,6 +47,22 @@ Then download via CSV
     python Scripts/load_DGV_nonMergedVars.py -f Download/GRCh37_hg19_variants_2016-05-15.txt -m Download/Database\ of\ Genomic\ Variants.csv
 
 
+
+### Details on Conversion.
+#### Sample Level
+Original Column | Converted Field
+--------------- | -----------
+study | studies
+external sample id | external_ids
+family id | bio_family_id
+source | bio_source
+sample description | bio_description
+ethnicity | bio_ethnicity
+gender | bio_gender
+cohort name | bio_sample_cohort
+
+
+
 ## TCGA
 
     Commandline example:
@@ -59,6 +78,8 @@ Then download via CSV
 4. Push to the branch: `git push origin my-new-feature`
 5. Submit a pull request :D
 
+## TODO / Bugs
+1. Need to add/fix Logging capabilities
 
 ## License
 
