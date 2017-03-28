@@ -42,7 +42,7 @@ parser.add_argument("-b", "--bin-size",
                     dest="binsize",
                     type=int,
                     help="bin size",
-                    metavar="FILE", required=True)
+                    required=True)
 parser.add_argument("-s", "--seg-file",
                     dest="seg_file",
                     type=lambda x: is_valid_file(parser, x),
@@ -70,4 +70,39 @@ cnvClcNom = "{}_{}".format(config.get('mongodb-conf', 'cnv_collection_prefix'), 
 wgsClcNom = "{}_{}".format(config.get('mongodb-conf', 'wgs_collection_prefix'), "HG19")
 
 cnvSmp = db[metaClcNom]
-#cnvClc = db[cnvClcNom]
+cnvClc = db[cnvClcNom]
+cnvWgs = db[wgsClcNom]
+
+
+### Will Need to expand this later. For Meta data.
+my_Samp={"data_source": "Mayo-Wandy", "entity_type": "single", "sample_name" : args.samplename, "_owner": "user", "_algorithm": "wandy.v1.2"}
+_id = cnvSmp.insert(loads(dumps(my_Samp)))
+
+### Add Segments to common collection.
+## Ability to filter on the fly ??? Only load significant segments l2r < -1 or l2r > .5 ??
+if args.seg_file is not None:
+    sCSVFile = csv.reader(open(args.seg_file, 'rU'), delimiter='\t')
+    sCSVHeaders = sCSVFile.next()
+
+
+### Required to Load Wandy Full Data to seperate Collection
+defaultRecord={"sample":_id, "binSz": int(args.binsize), "bins":[], "l2r":[]}
+
+sCSVFile = csv.reader(open(args.input, 'rU'), delimiter='\t')
+sCSVHeaders = sCSVFile.next()
+lastChr="chr1"
+workingRecord = defaultRecord
+workingRecord["chr"]=lastChr
+for row in sCSVFile:
+    if lastChr == row[0]:
+        workingRecord["bins"].append(int(row[1]))
+        workingRecord["l2r"].append(float(row[2]))
+    else:
+        #pp.pprint(workingRecord)
+        print(lastChr)
+        cnvWgs.insert(loads(dumps(workingRecord)))
+        lastChr=row[0]
+        workingRecord = defaultRecord
+        workingRecord["chr"]=lastChr
+
+cnvWgs.insert(loads(dumps(workingRecord)))
