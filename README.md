@@ -73,6 +73,13 @@ cohort name | bio_sample_cohort
 ## Wandy
 This is a tool built and deployed by our department.
 
+child_file<-"s_011-HLH-001_within_run.id/s_011-HLH-001_within_run.id_zoomout_BinCovg.txt"
+father_file<-"s_011-HLH-003_within_run.id/s_011-HLH-003_within_run.id_zoomout_BinCovg.txt"
+mother_file<-"s_011-HLH-004_within_run.id/s_011-HLH-004_within_run.id_zoomout_BinCovg.txt"
+
+    python Scripts/load_Wandy_Sample.py -i /Users/m088378/Desktop/ChenCNV/wandy/run.id_wandy_ver0p95/s_011-HLH-001_within_run.id/s_011-HLH-001_within_run.id_zoomout_BinCovg.txt -b 10000 -m s_011-HLH-001
+    python Scripts/load_Wandy_Sample.py -i /Users/m088378/Desktop/ChenCNV/wandy/run.id_wandy_ver0p95/s_011-HLH-003_within_run.id/s_011-HLH-003_within_run.id_zoomout_BinCovg.txt -b 10000 -m s_011-HLH-003 
+
 
 
 

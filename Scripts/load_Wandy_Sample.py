@@ -50,6 +50,8 @@ parser.add_argument("-s", "--seg-file",
                     metavar="FILE", required=False)
 parser.add_argument("-m", "--meta",
                     dest="samplename")
+parser.add_argument("-t", "--trio-member",
+                    dest="member")
 parser.set_defaults(feature=False)
 args = parser.parse_args()
 
@@ -86,7 +88,7 @@ if args.seg_file is not None:
 
 
 ### Required to Load Wandy Full Data to seperate Collection
-defaultRecord={"sample":_id, "binSz": int(args.binsize), "bins":[], "l2r":[]}
+defaultRecord={"sample":_id, "samplename" : args.samplename, "trio": args.member, "binSz": int(args.binsize), "graph":[]}
 
 sCSVFile = csv.reader(open(args.input, 'rU'), delimiter='\t')
 sCSVHeaders = sCSVFile.next()
@@ -95,8 +97,9 @@ workingRecord = defaultRecord
 workingRecord["chr"]=lastChr
 for row in sCSVFile:
     if lastChr == row[0]:
-        workingRecord["bins"].append(int(row[1]))
-        workingRecord["l2r"].append(float(row[2]))
+        workingRecord["graph"].append([int(row[1]), float(row[2])])
+        #workingRecord["l2r"].append(float(row[2]))
+        ### need to load as Graph point [bin, ltr]
     else:
         #pp.pprint(workingRecord)
         print(lastChr)
